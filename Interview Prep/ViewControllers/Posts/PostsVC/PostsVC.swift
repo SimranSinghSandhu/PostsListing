@@ -36,27 +36,8 @@ class PostsVC: LoadingIndicatorViewController {
             print("Count =", fetchedPosts.count)
         }
     }
-
-    func mapPostEntityToPost(postEntities: [PostEntity]) -> [Post] {
-        return postEntities.map { postEntity in
-            return Post(id: Int(postEntity.id), title: postEntity.title ?? "", body: postEntity.body ?? "")
-        }
-    }
     
-    private func fetchData(shouldReset: Bool = false) {
-        self.viewModal.isLoading = true
-        if shouldReset {
-            viewModal.currentPage = 1
-        } else {
-            viewModal.currentPage += 1
-        }
-        viewModal.fetchPosts(query: [URLQueryItem(name: "page", value: String(viewModal.currentPage))])
-    }
-    
-    @objc private func refresher() {
-        fetchData(shouldReset: true)
-    }
-    
+    // Listening to instances created in ViewModal
     private func observe() {
         viewModal.$error.receive(on: DispatchQueue.main)
             .sink { [weak self] error in
@@ -79,6 +60,7 @@ class PostsVC: LoadingIndicatorViewController {
             }.store(in: &garbageBag)
     }
     
+    // Handling events for communication from differenct screens
     private func handleEvents(event: EventPublisher) {
         switch event {
         case .PostColViewCellArrowTappedEvent(let post):
@@ -92,47 +74,28 @@ class PostsVC: LoadingIndicatorViewController {
             }
         }
     }
-    
-    private func savingData(posts: [Post]) {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        deleteAllPostsFromCoreData()
-        for post in posts {
-            let postManagedObject = post.managedObject(context: viewContext)
-            // Handle any additional operations or validations
-        }
-        
-        appDelegate.saveContext() // Save changes
-    }
-    
-    func deleteAllPostsFromCoreData() {
-        
-        let fetchRequest: NSFetchRequest<PostEntity> = PostEntity.fetchRequest()
-        
-        do {
-            let posts = try viewContext.fetch(fetchRequest)
-            for post in posts {
-                viewContext.delete(post)
-            }
-            try viewContext.save()
-        } catch let error {
-            print("Error deleting posts: \(error.localizedDescription)")
-        }
-    }
-    
-    
-    func fetchPostsFromCoreData() -> [PostEntity]? {
-        let fetchRequest: NSFetchRequest<PostEntity> = PostEntity.fetchRequest()
 
-        let sortDescriptor = NSSortDescriptor(key: "id", ascending: true) // Use the appropriate key
-        fetchRequest.sortDescriptors = [sortDescriptor]
-        
-        do {
-            let posts = try viewContext.fetch(fetchRequest)
-            return posts
-        } catch let error {
-            print("Error fetching posts: \(error.localizedDescription)")
-            return nil
+    // Mapping the fetched posts from CoreData to other class, so we can show it in the collectionView
+    func mapPostEntityToPost(postEntities: [PostEntity]) -> [Post] {
+        return postEntities.map { postEntity in
+            return Post(id: Int(postEntity.id), title: postEntity.title ?? "", body: postEntity.body ?? "")
         }
+    }
+    
+    // Fetching Posts from server
+    private func fetchData(shouldReset: Bool = false) {
+        self.viewModal.isLoading = true
+        if shouldReset { // If fetching first time, or using refreshControl to refresh the data
+            viewModal.currentPage = 1
+        } else { // If using with Pagination
+            viewModal.currentPage += 1
+        }
+        viewModal.fetchPosts(query: [URLQueryItem(name: "page", value: String(viewModal.currentPage))])
+    }
+    
+    // Will be called when user scrolls the collectionView down
+    @objc private func refresher() {
+        fetchData(shouldReset: true)
     }
     
     private func navigateToDetailScreen(post: Post) {
@@ -161,6 +124,7 @@ class PostsVC: LoadingIndicatorViewController {
     }
 }
 
+// MARK: - Collection View Delegate and Datasource Methods
 extension PostsVC: UICollectionViewDelegate, UICollectionViewDataSource {
     
     private func settingCollectionView() {
@@ -247,6 +211,54 @@ extension PostsVC {
             // Load more data
             self.bottomLoadingIndicator.startAnimating()
             fetchData()
+        }
+    }
+}
+
+// MARK: - CoreData
+extension PostsVC {
+    
+    // Saving data inside coredata after fetching it from the API
+    private func savingData(posts: [Post]) {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        deleteAllPostsFromCoreData()
+        for post in posts {
+            let postManagedObject = post.managedObject(context: viewContext)
+            // Handle any additional operations or validations
+        }
+        
+        appDelegate.saveContext() // Save changes
+    }
+    
+    // Before saving the new data, removing the previous, so we wont have any duplicates
+    func deleteAllPostsFromCoreData() {
+        
+        let fetchRequest: NSFetchRequest<PostEntity> = PostEntity.fetchRequest()
+        
+        do {
+            let posts = try viewContext.fetch(fetchRequest)
+            for post in posts {
+                viewContext.delete(post)
+            }
+            try viewContext.save()
+        } catch let error {
+            print("Error deleting posts: \(error.localizedDescription)")
+        }
+    }
+    
+    // Fetching Posts from CoreData
+    func fetchPostsFromCoreData() -> [PostEntity]? {
+        let fetchRequest: NSFetchRequest<PostEntity> = PostEntity.fetchRequest()
+
+        let sortDescriptor = NSSortDescriptor(key: "id", ascending: true) // Use the appropriate key
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        
+        do {
+            let posts = try viewContext.fetch(fetchRequest)
+            return posts
+        } catch let error {
+            print("Error fetching posts: \(error.localizedDescription)")
+            return nil
         }
     }
 }
