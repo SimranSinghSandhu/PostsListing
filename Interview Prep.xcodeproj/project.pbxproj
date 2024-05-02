@@ -23,6 +23,7 @@
 		4E3FB2A02BE3AB5F00D3EF65 /* String+EXT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E3FB29F2BE3AB5F00D3EF65 /* String+EXT.swift */; };
 		4E3FB2A22BE3B04C00D3EF65 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E3FB2A12BE3B04C00D3EF65 /* Colors.swift */; };
 		4E3FB2A52BE3CAC200D3EF65 /* UIButton+EXT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E3FB2A42BE3CAC200D3EF65 /* UIButton+EXT.swift */; };
+		4E3FB2A82BE3CE8F00D3EF65 /* InterviewPrep.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4E3FB2A62BE3CE8F00D3EF65 /* InterviewPrep.xcdatamodeld */; };
 		4E77658D2BE25061009C89AA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77658C2BE25061009C89AA /* AppDelegate.swift */; };
 		4E77658F2BE25061009C89AA /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77658E2BE25061009C89AA /* SceneDelegate.swift */; };
 		4E7765912BE25061009C89AA /* PostsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E7765902BE25061009C89AA /* PostsVC.swift */; };
@@ -48,6 +49,7 @@
 		4E3FB29F2BE3AB5F00D3EF65 /* String+EXT.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+EXT.swift"; sourceTree = "<group>"; };
 		4E3FB2A12BE3B04C00D3EF65 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		4E3FB2A42BE3CAC200D3EF65 /* UIButton+EXT.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+EXT.swift"; sourceTree = "<group>"; };
+		4E3FB2A72BE3CE8F00D3EF65 /* InterviewPrep.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = InterviewPrep.xcdatamodel; sourceTree = "<group>"; };
 		4E7765892BE25061009C89AA /* Interview Prep.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Interview Prep.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4E77658C2BE25061009C89AA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4E77658E2BE25061009C89AA /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -183,6 +185,7 @@
 				4E3FB28D2BE38F3E00D3EF65 /* Colors.xcassets */,
 				4E7765972BE25062009C89AA /* LaunchScreen.storyboard */,
 				4E77659A2BE25062009C89AA /* Info.plist */,
+				4E3FB2A62BE3CE8F00D3EF65 /* InterviewPrep.xcdatamodeld */,
 			);
 			path = "Interview Prep";
 			sourceTree = "<group>";
@@ -262,6 +265,7 @@
 			files = (
 				4E3FB2912BE3907400D3EF65 /* ViewController+EXT.swift in Sources */,
 				4E3FB29E2BE3A78800D3EF65 /* UISheetPresentationController+EXT.swift in Sources */,
+				4E3FB2A82BE3CE8F00D3EF65 /* InterviewPrep.xcdatamodeld in Sources */,
 				4E3FB2812BE388EF00D3EF65 /* APIHelper.swift in Sources */,
 				4E3FB2852BE38B6800D3EF65 /* PostsVM.swift in Sources */,
 				4E3FB27F2BE3850A00D3EF65 /* PostColViewCell.swift in Sources */,
@@ -501,6 +505,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		4E3FB2A62BE3CE8F00D3EF65 /* InterviewPrep.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				4E3FB2A72BE3CE8F00D3EF65 /* InterviewPrep.xcdatamodel */,
+			);
+			currentVersion = 4E3FB2A72BE3CE8F00D3EF65 /* InterviewPrep.xcdatamodel */;
+			path = InterviewPrep.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 4E7765812BE25061009C89AA /* Project object */;
 }

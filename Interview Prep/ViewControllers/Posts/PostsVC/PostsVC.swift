@@ -7,6 +7,7 @@
 
 import UIKit
 import Combine
+import CoreData
 
 class PostsVC: LoadingIndicatorViewController {
     
@@ -14,6 +15,8 @@ class PostsVC: LoadingIndicatorViewController {
     
     let viewModal = PostsVM()
     var garbageBag = Set<AnyCancellable>()
+    
+    var viewContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,12 +24,23 @@ class PostsVC: LoadingIndicatorViewController {
         
         settingCollectionView()
         observe()
-        fetchData()
+        fetchData(shouldReset: true)
         
         navigationItem.title = "Posts"
         navigationItem.largeTitleDisplayMode = .automatic
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.navigationBar.isTranslucent = true
+        
+        if let fetchedPosts = fetchPostsFromCoreData() {
+            self.viewModal.posts = mapPostEntityToPost(postEntities: fetchedPosts)
+            print("Count =", fetchedPosts.count)
+        }
+    }
+
+    func mapPostEntityToPost(postEntities: [PostEntity]) -> [Post] {
+        return postEntities.map { postEntity in
+            return Post(id: Int(postEntity.id), title: postEntity.title ?? "", body: postEntity.body ?? "")
+        }
     }
     
     private func fetchData(shouldReset: Bool = false) {
@@ -37,6 +51,10 @@ class PostsVC: LoadingIndicatorViewController {
             viewModal.currentPage += 1
         }
         viewModal.fetchPosts(query: [URLQueryItem(name: "page", value: String(viewModal.currentPage))])
+    }
+    
+    @objc private func refresher() {
+        fetchData(shouldReset: true)
     }
     
     private func observe() {
@@ -51,11 +69,13 @@ class PostsVC: LoadingIndicatorViewController {
         
         viewModal.$posts.receive(on: DispatchQueue.main)
             .sink { [weak self] posts in
-                guard let _ = posts else {return}
+                guard let posts = posts else {return}
                 self?.loadingIndicator.stopAnimating()
                 self?.collectionView.refreshControl?.endRefreshing()
                 self?.bottomLoadingIndicator.stopAnimating()
                 self?.collectionView.reloadData()
+                
+                self?.savingData(posts: posts)
             }.store(in: &garbageBag)
     }
     
@@ -73,8 +93,46 @@ class PostsVC: LoadingIndicatorViewController {
         }
     }
     
-    @objc private func refresher() {
-        fetchData(shouldReset: true)
+    private func savingData(posts: [Post]) {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        deleteAllPostsFromCoreData()
+        for post in posts {
+            let postManagedObject = post.managedObject(context: viewContext)
+            // Handle any additional operations or validations
+        }
+        
+        appDelegate.saveContext() // Save changes
+    }
+    
+    func deleteAllPostsFromCoreData() {
+        
+        let fetchRequest: NSFetchRequest<PostEntity> = PostEntity.fetchRequest()
+        
+        do {
+            let posts = try viewContext.fetch(fetchRequest)
+            for post in posts {
+                viewContext.delete(post)
+            }
+            try viewContext.save()
+        } catch let error {
+            print("Error deleting posts: \(error.localizedDescription)")
+        }
+    }
+    
+    
+    func fetchPostsFromCoreData() -> [PostEntity]? {
+        let fetchRequest: NSFetchRequest<PostEntity> = PostEntity.fetchRequest()
+
+        let sortDescriptor = NSSortDescriptor(key: "id", ascending: true) // Use the appropriate key
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        
+        do {
+            let posts = try viewContext.fetch(fetchRequest)
+            return posts
+        } catch let error {
+            print("Error fetching posts: \(error.localizedDescription)")
+            return nil
+        }
     }
     
     private func navigateToDetailScreen(post: Post) {

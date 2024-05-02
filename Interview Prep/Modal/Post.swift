@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CoreData
 
 struct Post: Codable {
     let id: Int
@@ -15,5 +16,15 @@ struct Post: Codable {
     
     enum CodingKeys: String, CodingKey {
         case id, title, body
+    }
+}
+
+extension Post {
+    func managedObject(context: NSManagedObjectContext) -> PostEntity {
+        let postEntity = PostEntity(context: context)
+        postEntity.id = Int64(self.id)
+        postEntity.title = self.title
+        postEntity.body = self.body
+        return postEntity
     }
 }
